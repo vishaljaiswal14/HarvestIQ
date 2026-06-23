@@ -1,0 +1,63 @@
+from fastapi import APIRouter
+
+from app.api.v1 import (
+    advisory,
+    alerts,
+    auth,
+    briefing,
+    copilot,
+    crop_cycles,
+    demo,
+    disease,
+    disease_radar,
+    farm_db,
+    farms,
+    health_card,
+    knowledge,
+    localization,
+    market,
+    onboarding,
+    optimizer,
+    profitability,
+    schemes,
+    simulator,
+    soil,
+    sos,
+    stress_index,
+    sync,
+    users,
+    verification,
+    voice,
+    weather,
+)
+
+api_router = APIRouter()
+api_router.include_router(auth.router)
+api_router.include_router(users.router)
+api_router.include_router(onboarding.router)
+api_router.include_router(farms.router)
+api_router.include_router(weather.router)
+api_router.include_router(crop_cycles.router)
+api_router.include_router(stress_index.router)
+api_router.include_router(alerts.router)
+api_router.include_router(alerts.notifications_router)
+api_router.include_router(copilot.router)
+api_router.include_router(soil.router)
+api_router.include_router(disease.router)
+api_router.include_router(advisory.router)
+api_router.include_router(disease_radar.router)
+api_router.include_router(farm_db.router)
+api_router.include_router(voice.router)
+api_router.include_router(localization.router)
+api_router.include_router(optimizer.router)
+api_router.include_router(briefing.router)
+api_router.include_router(schemes.router)
+api_router.include_router(market.router)
+api_router.include_router(health_card.router)
+api_router.include_router(profitability.router)
+api_router.include_router(knowledge.router)
+api_router.include_router(simulator.router)
+api_router.include_router(sos.router)
+api_router.include_router(demo.router)
+api_router.include_router(sync.router)
+api_router.include_router(verification.router)

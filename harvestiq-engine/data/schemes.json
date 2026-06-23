@@ -1,0 +1,41 @@
+[
+  {
+    "scheme_id": "PM-KISAN",
+    "name": "PM-KISAN",
+    "description": "Income support of Rs. 6000 per year in three equal installments.",
+    "eligible_states": ["ALL"],
+    "eligible_crops": ["ALL"],
+    "active": true,
+    "application_steps": [
+      "Visit nearest agriculture office or PM-KISAN portal",
+      "Submit land records and Aadhaar",
+      "Track status online"
+    ]
+  },
+  {
+    "scheme_id": "RJ-WHEAT-INSURANCE",
+    "name": "Rajasthan Wheat Crop Insurance",
+    "description": "Weather-based crop insurance for wheat farmers in Rajasthan.",
+    "eligible_states": ["RAJASTHAN"],
+    "eligible_crops": ["WHEAT"],
+    "active": true,
+    "application_steps": [
+      "Enroll before sowing window closes",
+      "Pay farmer premium share",
+      "File claim with crop loss evidence if needed"
+    ]
+  },
+  {
+    "scheme_id": "WB-RICE-SUBSIDY",
+    "name": "West Bengal Rice Input Subsidy",
+    "description": "Input subsidy for registered rice growers in West Bengal.",
+    "eligible_states": ["WEST BENGAL"],
+    "eligible_crops": ["RICE"],
+    "active": true,
+    "application_steps": [
+      "Register on state agriculture portal",
+      "Link farm and crop cycle details",
+      "Collect subsidy at authorized dealer"
+    ]
+  }
+]

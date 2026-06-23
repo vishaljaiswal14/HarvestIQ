@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="HarvestIQ">
+  <rect width="512" height="512" rx="96" fill="#047857"/>
+  <path fill="#ecfdf5" d="M128 352V160h64v192H128zm96 0V224h64v128h-64zm96 0V288h64v64h-64zm96-64V192h64v160h-64z"/>
+  <circle cx="256" cy="120" r="40" fill="#a7f3d0"/>
+</svg>

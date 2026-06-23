@@ -1,0 +1,32 @@
+[
+  {
+    "rule_id": "RULE_THERMAL_HIGH",
+    "name": "High Temperature Stress",
+    "severity": "HIGH",
+    "enabled": true,
+    "threshold": 38.0,
+    "primary_factor": "THERMAL",
+    "title": "High temperature stress",
+    "message_template": "Current temperature {current_temp}°C exceeds safe limit of {threshold}°C during {stage} stage."
+  },
+  {
+    "rule_id": "RULE_RAINFALL_DEFICIT",
+    "name": "Rainfall Deficit",
+    "severity": "MEDIUM",
+    "enabled": true,
+    "threshold": 0.7,
+    "primary_factor": "MOISTURE",
+    "title": "Rainfall deficit detected",
+    "message_template": "Rainfall deficit index {rainfall_deficit} indicates moisture stress during {stage} stage."
+  },
+  {
+    "rule_id": "RULE_FSI_HIGH",
+    "name": "High Field Stress Index",
+    "severity": "HIGH",
+    "enabled": true,
+    "threshold": 0.67,
+    "primary_factor": "THERMAL",
+    "title": "High field stress index",
+    "message_template": "Field stress index {fsi} is HIGH during {stage} stage."
+  }
+]

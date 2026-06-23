@@ -1,0 +1,14 @@
+from typing import Final
+
+ACTION_SPRAY: Final[str] = "SPRAY"
+ACTION_IRRIGATE: Final[str] = "IRRIGATE"
+ACTION_FERTILIZE: Final[str] = "FERTILIZE"
+
+ALLOWED_ACTIONS: Final[frozenset[str]] = frozenset({ACTION_SPRAY, ACTION_IRRIGATE, ACTION_FERTILIZE})
+
+WIND_LIMIT_KMH: Final[float] = 20.0
+RAIN_LIMIT_MM_3D: Final[float] = 5.0
+
+RULE_HIGH_WIND: Final[str] = "RULE_HIGH_WIND"
+RULE_RAIN_FORECAST: Final[str] = "RULE_RAIN_FORECAST"
+RULE_HIGH_FSI_FERTILIZE: Final[str] = "RULE_HIGH_FSI_FERTILIZE"

@@ -1,0 +1,16 @@
+from typing import Final
+
+EMERGENCY_FLOOD: Final[str] = "FLOOD"
+EMERGENCY_FROST: Final[str] = "FROST"
+EMERGENCY_HEATWAVE: Final[str] = "HEATWAVE"
+EMERGENCY_GENERAL: Final[str] = "GENERAL"
+
+ALLOWED_EMERGENCY_TYPES: Final[frozenset[str]] = frozenset(
+    {EMERGENCY_FLOOD, EMERGENCY_FROST, EMERGENCY_HEATWAVE, EMERGENCY_GENERAL}
+)
+
+DELIVERY_LOGGED: Final[str] = "LOGGED"
+DELIVERY_SMS_SENT: Final[str] = "SMS_SENT"
+DELIVERY_SMS_FAILED: Final[str] = "SMS_FAILED"
+
+SOS_RATE_LIMIT: Final[str] = "5/hour"

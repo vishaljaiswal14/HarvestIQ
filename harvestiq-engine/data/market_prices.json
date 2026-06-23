@@ -1,0 +1,52 @@
+[
+  {
+    "mandi": "Bharatpur APMC",
+    "state": "RAJASTHAN",
+    "district": "BHARATPUR",
+    "crop_type": "WHEAT",
+    "min_price": 2100,
+    "max_price": 2350,
+    "modal_price": 2250,
+    "price_date": "2026-06-10T00:00:00Z"
+  },
+  {
+    "mandi": "Bharatpur APMC",
+    "state": "RAJASTHAN",
+    "district": "BHARATPUR",
+    "crop_type": "WHEAT",
+    "min_price": 2080,
+    "max_price": 2320,
+    "modal_price": 2220,
+    "price_date": "2026-06-09T00:00:00Z"
+  },
+  {
+    "mandi": "Kolkata Koley Market",
+    "state": "WEST BENGAL",
+    "district": "KOLKATA",
+    "crop_type": "RICE",
+    "min_price": 2800,
+    "max_price": 3100,
+    "modal_price": 2950,
+    "price_date": "2026-06-10T00:00:00Z"
+  },
+  {
+    "mandi": "Kolkata Koley Market",
+    "state": "WEST BENGAL",
+    "district": "KOLKATA",
+    "crop_type": "RICE",
+    "min_price": 2750,
+    "max_price": 3050,
+    "modal_price": 2900,
+    "price_date": "2026-06-09T00:00:00Z"
+  },
+  {
+    "mandi": "Nagpur APMC",
+    "state": "MAHARASHTRA",
+    "district": "NAGPUR",
+    "crop_type": "COTTON",
+    "min_price": 6200,
+    "max_price": 6800,
+    "modal_price": 6500,
+    "price_date": "2026-06-10T00:00:00Z"
+  }
+]

@@ -1,0 +1,37 @@
+from typing import Final
+
+SEVERITY_LOW: Final[str] = "LOW"
+SEVERITY_MEDIUM: Final[str] = "MEDIUM"
+SEVERITY_HIGH: Final[str] = "HIGH"
+SEVERITY_CRITICAL: Final[str] = "CRITICAL"
+
+SEVERITY_TIERS: Final[tuple[str, ...]] = (
+    SEVERITY_LOW,
+    SEVERITY_MEDIUM,
+    SEVERITY_HIGH,
+    SEVERITY_CRITICAL,
+)
+
+SEVERITY_RANK: Final[dict[str, int]] = {
+    SEVERITY_LOW: 1,
+    SEVERITY_MEDIUM: 2,
+    SEVERITY_HIGH: 3,
+    SEVERITY_CRITICAL: 4,
+}
+
+# Base tier thresholds
+FSI_MEDIUM_MIN: Final[float] = 0.35
+FSI_HIGH_MIN: Final[float] = 0.65
+
+# CRITICAL triggers
+CRITICAL_FSI_WITH_CONFIRMED_DISEASE: Final[float] = 0.75
+CRITICAL_MIN_HIGH_ALERTS: Final[int] = 2
+RECENT_SOS_LOOKBACK_HOURS: Final[int] = 24
+
+# Critical trigger identifiers (stored in logs / explainability)
+TRIGGER_CONFIRMED_DISEASE_HIGH_FSI: Final[str] = "CONFIRMED_DISEASE_HIGH_FSI"
+TRIGGER_MULTIPLE_HIGH_ALERTS: Final[str] = "MULTIPLE_HIGH_ALERTS"
+TRIGGER_RECENT_SOS: Final[str] = "RECENT_SOS"
+TRIGGER_ADVISORY_EMERGENCY: Final[str] = "ADVISORY_EMERGENCY"
+
+ADVISORY_PRIORITY_EMERGENCY: Final[str] = "EMERGENCY"

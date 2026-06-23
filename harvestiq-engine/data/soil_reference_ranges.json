@@ -1,0 +1,66 @@
+{
+  "WHEAT": {
+    "nitrogen": { "low": 200, "high": 400 },
+    "phosphorus": { "low": 12, "high": 25 },
+    "potassium": { "low": 150, "high": 300 },
+    "ph": { "low": 6.0, "high": 7.5 },
+    "organic_carbon": { "low": 0.40, "high": 0.75 },
+    "electrical_conductivity": { "low": 0.2, "high": 1.5 }
+  },
+  "RICE": {
+    "nitrogen": { "low": 220, "high": 450 },
+    "phosphorus": { "low": 10, "high": 22 },
+    "potassium": { "low": 120, "high": 280 },
+    "ph": { "low": 5.5, "high": 7.0 },
+    "organic_carbon": { "low": 0.45, "high": 0.80 },
+    "electrical_conductivity": { "low": 0.2, "high": 1.2 }
+  },
+  "MAIZE": {
+    "nitrogen": { "low": 210, "high": 420 },
+    "phosphorus": { "low": 11, "high": 24 },
+    "potassium": { "low": 140, "high": 290 },
+    "ph": { "low": 5.8, "high": 7.2 },
+    "organic_carbon": { "low": 0.38, "high": 0.70 },
+    "electrical_conductivity": { "low": 0.2, "high": 1.4 }
+  },
+  "COTTON": {
+    "nitrogen": { "low": 180, "high": 380 },
+    "phosphorus": { "low": 10, "high": 20 },
+    "potassium": { "low": 160, "high": 320 },
+    "ph": { "low": 6.0, "high": 8.0 },
+    "organic_carbon": { "low": 0.35, "high": 0.65 },
+    "electrical_conductivity": { "low": 0.2, "high": 2.0 }
+  },
+  "SUGARCANE": {
+    "nitrogen": { "low": 230, "high": 460 },
+    "phosphorus": { "low": 12, "high": 26 },
+    "potassium": { "low": 170, "high": 350 },
+    "ph": { "low": 6.0, "high": 7.8 },
+    "organic_carbon": { "low": 0.42, "high": 0.78 },
+    "electrical_conductivity": { "low": 0.2, "high": 1.6 }
+  },
+  "SOYBEAN": {
+    "nitrogen": { "low": 190, "high": 390 },
+    "phosphorus": { "low": 13, "high": 28 },
+    "potassium": { "low": 145, "high": 295 },
+    "ph": { "low": 6.0, "high": 7.0 },
+    "organic_carbon": { "low": 0.40, "high": 0.72 },
+    "electrical_conductivity": { "low": 0.2, "high": 1.3 }
+  },
+  "MUSTARD": {
+    "nitrogen": { "low": 195, "high": 395 },
+    "phosphorus": { "low": 11, "high": 23 },
+    "potassium": { "low": 135, "high": 285 },
+    "ph": { "low": 6.0, "high": 7.5 },
+    "organic_carbon": { "low": 0.38, "high": 0.68 },
+    "electrical_conductivity": { "low": 0.2, "high": 1.4 }
+  },
+  "POTATO": {
+    "nitrogen": { "low": 200, "high": 410 },
+    "phosphorus": { "low": 14, "high": 30 },
+    "potassium": { "low": 180, "high": 340 },
+    "ph": { "low": 5.2, "high": 6.8 },
+    "organic_carbon": { "low": 0.45, "high": 0.80 },
+    "electrical_conductivity": { "low": 0.2, "high": 1.2 }
+  }
+}

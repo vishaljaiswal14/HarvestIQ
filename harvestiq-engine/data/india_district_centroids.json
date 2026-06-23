@@ -1,0 +1,91 @@
+{
+  "PUNJAB": {
+    "LUDHIANA": { "latitude": 30.9010, "longitude": 75.8573 },
+    "AMRITSAR": { "latitude": 31.6340, "longitude": 74.8723 },
+    "JALANDHAR": { "latitude": 31.3260, "longitude": 75.5762 },
+    "PATIALA": { "latitude": 30.3398, "longitude": 76.3869 },
+    "BATHINDA": { "latitude": 30.2110, "longitude": 74.9455 }
+  },
+  "HARYANA": {
+    "GURGAON": { "latitude": 28.4595, "longitude": 77.0266 },
+    "GURUGRAM": { "latitude": 28.4595, "longitude": 77.0266 },
+    "KARNAL": { "latitude": 29.6857, "longitude": 76.9905 },
+    "HISAR": { "latitude": 29.1492, "longitude": 75.7217 },
+    "ROHTAK": { "latitude": 28.8955, "longitude": 76.6066 }
+  },
+  "UTTAR PRADESH": {
+    "LUCKNOW": { "latitude": 26.8467, "longitude": 80.9462 },
+    "KANPUR": { "latitude": 26.4499, "longitude": 80.3319 },
+    "MEERUT": { "latitude": 28.9845, "longitude": 77.7064 },
+    "AGRA": { "latitude": 27.1767, "longitude": 78.0081 },
+    "VARANASI": { "latitude": 25.3176, "longitude": 82.9739 }
+  },
+  "MAHARASHTRA": {
+    "PUNE": { "latitude": 18.5204, "longitude": 73.8567 },
+    "NAGPUR": { "latitude": 21.1458, "longitude": 79.0882 },
+    "MUMBAI": { "latitude": 19.0760, "longitude": 72.8777 },
+    "NASHIK": { "latitude": 19.9975, "longitude": 73.7898 },
+    "AURANGABAD": { "latitude": 19.8762, "longitude": 75.3433 }
+  },
+  "KARNATAKA": {
+    "BENGALURU": { "latitude": 12.9716, "longitude": 77.5946 },
+    "BANGALORE": { "latitude": 12.9716, "longitude": 77.5946 },
+    "MYSURU": { "latitude": 12.2958, "longitude": 76.6394 },
+    "MYSORE": { "latitude": 12.2958, "longitude": 76.6394 },
+    "HUBBALLI": { "latitude": 15.3647, "longitude": 75.1240 }
+  },
+  "TAMIL NADU": {
+    "CHENNAI": { "latitude": 13.0827, "longitude": 80.2707 },
+    "COIMBATORE": { "latitude": 11.0168, "longitude": 76.9558 },
+    "MADURAI": { "latitude": 9.9252, "longitude": 78.1198 },
+    "TIRUCHIRAPPALLI": { "latitude": 10.7905, "longitude": 78.7047 }
+  },
+  "RAJASTHAN": {
+    "JAIPUR": { "latitude": 26.9124, "longitude": 75.7873 },
+    "JODHPUR": { "latitude": 26.2389, "longitude": 73.0243 },
+    "KOTA": { "latitude": 25.2138, "longitude": 75.8648 },
+    "BIKANER": { "latitude": 28.0229, "longitude": 73.3119 },
+    "BHARATPUR": { "latitude": 27.2152, "longitude": 77.5030 }
+  },
+  "GUJARAT": {
+    "AHMEDABAD": { "latitude": 23.0225, "longitude": 72.5714 },
+    "SURAT": { "latitude": 21.1702, "longitude": 72.8311 },
+    "VADODARA": { "latitude": 22.3072, "longitude": 73.1812 },
+    "RAJKOT": { "latitude": 22.3039, "longitude": 70.8022 }
+  },
+  "MADHYA PRADESH": {
+    "BHOPAL": { "latitude": 23.2599, "longitude": 77.4126 },
+    "INDORE": { "latitude": 22.7196, "longitude": 75.8577 },
+    "GWALIOR": { "latitude": 26.2183, "longitude": 78.1828 },
+    "JABALPUR": { "latitude": 23.1815, "longitude": 79.9864 }
+  },
+  "WEST BENGAL": {
+    "KOLKATA": { "latitude": 22.5726, "longitude": 88.3639 },
+    "HOWRAH": { "latitude": 22.5958, "longitude": 88.2636 },
+    "DARJEELING": { "latitude": 27.0360, "longitude": 88.2627 }
+  },
+  "BIHAR": {
+    "PATNA": { "latitude": 25.5941, "longitude": 85.1376 },
+    "GAYA": { "latitude": 24.7955, "longitude": 85.0002 },
+    "MUZAFFARPUR": { "latitude": 26.1209, "longitude": 85.3647 }
+  },
+  "ANDHRA PRADESH": {
+    "VIJAYAWADA": { "latitude": 16.5062, "longitude": 80.6480 },
+    "VISAKHAPATNAM": { "latitude": 17.6868, "longitude": 83.2185 },
+    "GUNTUR": { "latitude": 16.3067, "longitude": 80.4365 }
+  },
+  "TELANGANA": {
+    "HYDERABAD": { "latitude": 17.3850, "longitude": 78.4867 },
+    "WARANGAL": { "latitude": 17.9689, "longitude": 79.5941 }
+  },
+  "KERALA": {
+    "THIRUVANANTHAPURAM": { "latitude": 8.5241, "longitude": 76.9366 },
+    "KOCHI": { "latitude": 9.9312, "longitude": 76.2673 },
+    "KOZHIKODE": { "latitude": 11.2588, "longitude": 75.7804 }
+  },
+  "DELHI": {
+    "NEW DELHI": { "latitude": 28.6139, "longitude": 77.2090 },
+    "DELHI": { "latitude": 28.6139, "longitude": 77.2090 },
+    "CENTRAL DELHI": { "latitude": 28.6486, "longitude": 77.2189 }
+  }
+}

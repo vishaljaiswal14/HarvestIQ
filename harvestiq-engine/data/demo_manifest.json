@@ -1,0 +1,17 @@
+{
+  "demo_mode": true,
+  "version": "1.0",
+  "description": "HarvestIQ demo fixture manifest for offline and kiosk demonstrations.",
+  "farms": [
+    {
+      "farm_id": "demo-farm-rajasthan-wheat",
+      "farm_name": "Demo Farm — Bharatpur Wheat",
+      "state": "Rajasthan",
+      "district": "Bharatpur",
+      "crop_type": "WHEAT",
+      "crop_cycle_id": "demo-cycle-001",
+      "sowing_date": "2025-11-15",
+      "soil_type": "Loamy"
+    }
+  ]
+}
