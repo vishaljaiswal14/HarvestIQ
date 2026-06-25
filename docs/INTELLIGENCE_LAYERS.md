@@ -1,6 +1,6 @@
 # HarvestIQ Intelligence Layers
 
-This document describes the deterministic intelligence layers in HarvestIQ and how they relate to `ContextCompilerService` (single source of truth, snapshot **v3**). Gemini is used only for presentation (advisory/briefing synthesis, vision, voice) — never for agronomic decisions.
+This document details the different data and calculations modules (what we call our "intelligence layers") in HarvestIQ, showing how they connect to the `ContextCompilerService` (snapshot version **v3**). A key design goal we stuck to is that Gemini is only used to format, transcribe, or translate information—never to make actual crop decisions.
 
 ---
 
@@ -8,11 +8,11 @@ This document describes the deterministic intelligence layers in HarvestIQ and h
 
 | Attribute | Detail |
 |-----------|--------|
-| **Purpose** | Provide current conditions and short-range forecast for field decisions |
-| **Inputs** | Farm geolocation, Open-Meteo (or cached `weather_cache`) |
-| **Outputs** | Current temp/humidity/wind/precipitation, 7-day forecast, daily GDD series |
-| **Dependencies** | Farm onboarding, location coordinates |
-| **Owner** | **Deterministic** — `WeatherService`, MongoDB `weather_cache` (30 min TTL) |
+| **Purpose** | Gets the current weather and forecast coordinates to help the farm engines make decisions |
+| **Inputs** | Farm geolocation, Open-Meteo API (or cached `weather_cache` logs) |
+| **Outputs** | Current temp, humidity, wind, rainfall, 7-day forecast series, and GDD parameters |
+| **Dependencies** | Farm location coordinates |
+| **Owner** | **Deterministic Code** — managed by `WeatherService` with a 30-minute MongoDB cache TTL to avoid hitting API rate limits |
 | **Gemini** | None |
 
 **Consumers:** Field Stress Index, Input Window Optimizer, Crop Stage (GDD), Daily Briefing, ContextCompiler weather sections.
@@ -23,11 +23,11 @@ This document describes the deterministic intelligence layers in HarvestIQ and h
 
 | Attribute | Detail |
 |-----------|--------|
-| **Purpose** | Resolve crop type, growth stage, and GDD progress |
-| **Inputs** | Active `crop_cycles`, sowing date, `crop_characteristics` stage definitions, weather GDD |
-| **Outputs** | Stage name, progress %, GDD timeline, stage vulnerability weights |
+| **Purpose** | Determines the active crop type, current development stage, and GDD percentage |
+| **Inputs** | Active `crop_cycles`, sowing date, `crop_characteristics` stage definitions, weather GDD logs |
+| **Outputs** | Stage name, progress percentage, accumulated GDD, stage vulnerability weights |
 | **Dependencies** | Weather Intelligence |
-| **Owner** | **Deterministic** — `CropStageService`, `deterministic_engine` (GDD, stage resolution) |
+| **Owner** | **Deterministic Code** — `CropStageService` calculates heat units and matches them to stage boundaries |
 | **Gemini** | None |
 
 **Consumers:** FSI, Yield Risk, Health Card, Simulator, Input Window Optimizer.
@@ -38,14 +38,14 @@ This document describes the deterministic intelligence layers in HarvestIQ and h
 
 | Attribute | Detail |
 |-----------|--------|
-| **Purpose** | Quantify composite field stress from weather and crop progress |
-| **Inputs** | Current/forecast temperature, precipitation, accumulated GDD, stage vulnerability |
-| **Outputs** | FSI score (0–1), classification (`LOW_STRESS` / `MEDIUM_STRESS` / `HIGH_STRESS`), component breakdown, primary factor |
+| **Purpose** | Calculates a composite stress index score based on hot/cold snaps, dry spells, and GDD stage vulnerabilities |
+| **Inputs** | Forecast temperatures, precipitation forecasts, accumulated GDD, and current growth stages |
+| **Outputs** | FSI score (0–1), stress classification band (`LOW_STRESS` / `MEDIUM_STRESS` / `HIGH_STRESS`), and dominant stress factors |
 | **Dependencies** | Weather Intelligence, Crop Intelligence |
-| **Owner** | **Deterministic** — `StressIndexService`, `deterministic_engine.compute_fsi()` |
+| **Owner** | **Deterministic Code** — `StressIndexService` triggers the `compute_fsi()` Python function |
 | **Gemini** | None |
 
-**Persistence:** `stress_logs` (historical FSI for momentum).
+**Persistence:** `stress_logs` (stores historical FSI ratings to track trends).
 
 **Consumers:** Stress Momentum, Yield Risk, Alerts, Health Card, Advisory context, SOS checklist.
 
@@ -55,14 +55,14 @@ This document describes the deterministic intelligence layers in HarvestIQ and h
 
 | Attribute | Detail |
 |-----------|--------|
-| **Purpose** | Detect whether field stress is worsening, stable, or improving over time |
-| **Inputs** | `stress_logs` FSI time series (7-day / last 5 logs); optional projected FSI for simulator |
-| **Outputs** | `RISING` / `STABLE` / `FALLING`, `momentum_score`, `fsi_delta`, `insufficient_history` flag |
-| **Dependencies** | Stress Intelligence (historical logs) |
-| **Owner** | **Deterministic** — `StressMomentumService` → `compute_stress_momentum()` |
+| **Purpose** | Checks if the stress trend is getting worse, staying stable, or getting better compared to recent days |
+| **Inputs** | Historical FSI numbers from `stress_logs` (last 5 logs / 7 days); projected FSI values for simulations |
+| **Outputs** | Trend status (`RISING` / `STABLE` / `FALLING`), calculated momentum score, and change delta |
+| **Dependencies** | Stress Intelligence (historical log indexes) |
+| **Owner** | **Deterministic Code** — `StressMomentumService` calculates differences against historical logs |
 | **Gemini** | None |
 
-**Assembly:** Only via `ContextCompilerService._build_core_intelligence()` (v3).
+**Assembly:** Handled only via `ContextCompilerService._build_core_intelligence()` (v3).
 
 **Consumers:** Yield Risk, Health Card, Daily Briefing, Simulator, Advisory context.
 
@@ -72,11 +72,11 @@ This document describes the deterministic intelligence layers in HarvestIQ and h
 
 | Attribute | Detail |
 |-----------|--------|
-| **Purpose** | Assess soil nutrient status and composite soil health |
-| **Inputs** | Lab measurements (N, P, K, pH, OC, EC), crop-specific reference ranges |
-| **Outputs** | Soil Health Index (SHI), per-nutrient deficiency status, explainability |
-| **Dependencies** | Active crop cycle (for crop-type ranges) |
-| **Owner** | **Deterministic** — `SoilHealthService`, `compute_soil_health_index()` |
+| **Purpose** | Scores lab report metrics against reference guidelines to measure soil nutrient status |
+| **Inputs** | Raw chemical metrics (NPK, pH, Organic Carbon, Electrical Conductivity) and crop-specific reference guidelines |
+| **Outputs** | Soil Health Index (SHI) score out of 100, nutrient deficiency status flags, and explainability report logs |
+| **Dependencies** | Active crop cycle details (to match against the right crop thresholds) |
+| **Owner** | **Deterministic Code** — `SoilHealthService` maps NPK, pH, organic carbon, and EC metrics |
 | **Gemini** | None |
 
 **Consumers:** Yield Risk, Health Card, ContextCompiler soil sections.
@@ -87,12 +87,12 @@ This document describes the deterministic intelligence layers in HarvestIQ and h
 
 | Attribute | Detail |
 |-----------|--------|
-| **Purpose** | Detect, confirm, and track disease signals at farm and regional level |
-| **Inputs** | Image (vision tag), crop type, state, confidence threshold, `disease_allowed_regions` rules |
-| **Outputs** | Disease tag, `CONFIRMED` / `LOW_CONFIDENCE` / `REJECTED`, radar hotspots |
-| **Dependencies** | Farm profile, disease reports, disease radar aggregation |
-| **Owner** | **Hybrid** — Gemini Vision proposes tag/confidence; **deterministic confirmation** gates all outputs |
-| **Gemini** | Vision only (`detect_disease`); confirmation is rule-based |
+| **Purpose** | Identifies leaf diseases, cross-references findings with local records, and charts outbreak coordinates |
+| **Inputs** | Leaf image (vision tag), crop type, coordinates (state/district), and state allowlist validation rules |
+| **Outputs** | Disease tag, diagnostic state (`CONFIRMED` / `LOW_CONFIDENCE` / `REJECTED`), and nearby outbreak coordinates |
+| **Dependencies** | Farm location profile, disease scans collection, and regional alert radars |
+| **Owner** | **Hybrid** — Gemini Vision does the visual symptom scan, but a deterministic state allowlist filters the outputs before reporting |
+| **Gemini** | Only for symptom tag suggestions (`detect_disease`); regional rules must confirm it |
 
 **Consumers:** Yield Risk (confirmed disease + nearby radar), Health Card, Disease Radar map, Advisory context.
 
@@ -102,14 +102,14 @@ This document describes the deterministic intelligence layers in HarvestIQ and h
 
 | Attribute | Detail |
 |-----------|--------|
-| **Purpose** | Retrieve agronomic knowledge excerpts relevant to a query |
-| **Inputs** | User query, crop type, state, district, inferred topic |
-| **Outputs** | Ranked knowledge chunks, citations, chunk IDs |
-| **Dependencies** | ChromaDB vector store, `knowledge_metadata` |
-| **Owner** | **Deterministic** — `RagService.hybrid_search()` (embedding + metadata filters) |
-| **Gemini** | None for retrieval; synthesis happens in Advisory layer |
+| **Purpose** | Retrieves research documents and expert advice related to a user's question |
+| **Inputs** | Inferred query topic, crop type, state, district, and raw text keywords |
+| **Outputs** | Relevancy-ranked research excerpts, citations, and metadata details |
+| **Dependencies** | ChromaDB collections, MongoDB `knowledge_metadata` index logs |
+| **Owner** | **Deterministic Code** — `RagService.hybrid_search()` runs similarity math and local tag checks in ChromaDB |
+| **Gemini** | None for retrieval; synthesis happens in the Advisory layer |
 
-**Consumers:** Advisory (`compile_context` only).
+**Consumers:** Advisory (`compile_context` gathering step only).
 
 ---
 
@@ -117,14 +117,14 @@ This document describes the deterministic intelligence layers in HarvestIQ and h
 
 | Attribute | Detail |
 |-----------|--------|
-| **Purpose** | Answer farmer questions with grounded natural language |
-| **Inputs** | Compiled context package (v3 core + RAG excerpts + user question), language, mitigation lock flag |
-| **Outputs** | Synthesis text, citations, explainability, `advisory_logs` audit record |
-| **Dependencies** | ContextCompilerService v3, Knowledge Intelligence, all core layers |
-| **Owner** | **Hybrid** — context assembly is deterministic; **Gemini synthesizes** from context only |
-| **Gemini** | `synthesize_advisory()` — presentation only |
+| **Purpose** | Synthesizes data inputs and research sheets into a clear reply in local languages |
+| **Inputs** | Grounded context template (v3 state snapshot + retrieved research papers + query text) and local language key |
+| **Outputs** | Advice response text, verified doc citations, explainability parameters, and database audit logs |
+| **Dependencies** | ContextCompilerService v3, Knowledge Intelligence, and core farm telemetry engines |
+| **Owner** | **Hybrid** — Context gathering is strictly code-based, and Gemini formats the text payload without adding outside assumptions |
+| **Gemini** | Used inside `synthesize_advisory()` only for formatting and language translation |
 
-**Rule:** Gemini must not invent facts outside the context package.
+**Rule:** Gemini is strictly blocked from making up suggestions or facts outside the compiled context package.
 
 ---
 
@@ -132,16 +132,16 @@ This document describes the deterministic intelligence layers in HarvestIQ and h
 
 | Attribute | Detail |
 |-----------|--------|
-| **Purpose** | Estimate harvest/yield risk from multi-signal farm state |
-| **Inputs** | FSI, Stress Momentum, crop stage (via stage vulnerability), SHI, disease presence (confirmed reports + nearby radar) |
-| **Outputs** | `LOW` / `MEDIUM` / `HIGH` band, `estimated_risk_percent`, contributing factors |
-| **Dependencies** | Stress, Momentum, Crop, Soil, Disease layers |
-| **Owner** | **Deterministic** — `YieldRiskService` → `compute_yield_risk()` |
+| **Purpose** | Calculates a final yield risk score by checking weather stress, crop age, soil logs, and nearby pests |
+| **Inputs** | FSI, Stress Momentum trends, crop growth vulnerability factors, Soil Health Index, and regional disease radar hits |
+| **Outputs** | Yield danger rating (`LOW` / `MEDIUM` / `HIGH`), risk percentage, and primary contributing signals |
+| **Dependencies** | Stress Index, Momentum, Crop Stage, Soil, and Disease modules |
+| **Owner** | **Deterministic Code** — calculated by `YieldRiskService` using standard logic weights |
 | **Gemini** | None |
 
-**Assembly:** Only via `ContextCompilerService._build_core_intelligence()` (v3).
+**Assembly:** Handled only via `ContextCompilerService._build_core_intelligence()` (v3).
 
-**Consumers:** Health Card, Daily Briefing, Simulator, Advisory context, SOS (read-only health snapshot).
+**Consumers:** Health Card, Daily Briefing, Simulator, Advisory context, SOS emergency snap.
 
 ---
 
@@ -149,18 +149,20 @@ This document describes the deterministic intelligence layers in HarvestIQ and h
 
 | Attribute | Detail |
 |-----------|--------|
-| **Purpose** | Unified farm health summary for dashboard and emergency response |
-| **Inputs** | Full v3 core snapshot: FSI, momentum, yield risk, SHI, alerts, radar; plus `compute_health_risk_rating()` |
-| **Outputs** | `health_score`, `health_band`, full Health Card payload, explainability |
-| **Dependencies** | All layers above via `compile_health_snapshot()` |
-| **Owner** | **Deterministic** — `HealthCardService` maps compiler output; no local assembly |
+| **Purpose** | Aggregates the entire farm snapshot to render dashboard health cards and emergency guides |
+| **Inputs** | Full v3 core snapshot variables: FSI, trends, yield risk, soil rating, alerts, nearby outbreaks |
+| **Outputs** | Combined health score rating (0–100), health band tag, and health card details |
+| **Dependencies** | Core snapshot compiled via `compile_health_snapshot()` |
+| **Owner** | **Deterministic Code** — `HealthCardService` maps compiler metrics directly (no custom data changes) |
 | **Gemini** | None |
 
-**Consumers:** Dashboard (`GET /health-card`), SOS (`compile_health_snapshot` for emergency checklist).
+**Consumers:** Dashboard (`GET /health-card`), SOS emergency checklist compilation.
 
 ---
 
 ## ContextCompilerService Integration Map
+
+Here is a map of what data the `ContextCompilerService` pulls together depending on the page or request:
 
 | Compiler mode | Layers included |
 |---------------|-----------------|
@@ -175,6 +177,8 @@ This document describes the deterministic intelligence layers in HarvestIQ and h
 
 ## Gemini Usage Summary
 
+This table acts as our rules guide for where AI is allowed vs where we must use code:
+
 | Allowed | Not allowed |
 |---------|-------------|
 | Advisory synthesis | FSI, momentum, yield risk, optimizer, simulator |
@@ -186,4 +190,4 @@ This document describes the deterministic intelligence layers in HarvestIQ and h
 
 ## Day 7 Resiliency (non-intelligence)
 
-SOS, Demo Mode, PWA caching, and Verification Logging do **not** add new intelligence layers. SOS reads `compile_health_snapshot()`; Demo Mode serves static fixtures; PWA caches last-known compiler outputs.
+Things like our emergency SOS logs, demo mode mocks, browser caches, and validation checklists don't build new calculation models. SOS checks the current health score, demo mode serves simple JSON files, and PWA caches the latest backend reports.

@@ -1,19 +1,8 @@
-<details>
-  <summary><b>Important Notes</b></summary>
-
-  ### SOS Emergency Feature
-  The SOS module is integrated with Twilio for SMS/call notifications.
-
-  **Current Limitation:** Due to Twilio trial account restrictions, SOS alerts can currently be delivered only to phone numbers that have been verified in the Twilio console. Unverified numbers will not receive SMS/call notifications.
-
-  For hackathon evaluation purposes, the feature is fully implemented and functional, but successful message delivery is limited to Twilio-verified recipient numbers.
-</details>
-
 <div align="center">
 
 # HarvestIQ — Explainable Agricultural Intelligence Platform
 
-### Smarter Agricultural Decision-Making via Deterministic Field Intelligence, Hybrid RAG, and Grounded Advisory Synthesis
+### A smart farming dashboard that runs agronomic calculations with a deterministic rule engine, using a generative LLM layer only to present findings and translate advisories.
 
 [![Next.js](https://img.shields.io/badge/Next.js-15-black?style=for-the-badge&logo=next.js)](https://nextjs.org/)
 [![FastAPI](https://img.shields.io/badge/FastAPI-0.115-009688?style=for-the-badge&logo=fastapi)](https://fastapi.tiangolo.com/)
@@ -25,17 +14,38 @@
 
 </div>
 
+---
+
+## Table of Contents
+* [Quick Highlights](#quick-highlights)
+* [Live Demo](#live-demo)
+* [Platform Dashboard](#platform-dashboard)
+* [Project Philosophy](#project-philosophy)
+* [Core Engines & Mathematical Models](#core-engines--mathematical-models)
+* [System Architecture & Data Flow](#system-architecture--data-flow)
+* [Repository Structure](#repository-structure)
+* [Feature Showcase](#feature-showcase)
+* [Implementation Snippet](#implementation-snippet)
+* [Design Decisions](#design-decisions)
+* [Engineering Journey](#engineering-journey)
+* [Lessons Learned](#lessons-learned)
+* [Challenges](#challenges)
+* [API Reference](#api-reference)
+* [Security & Reliability](#security--reliability)
+* [Validation & Test Suite](#validation--test-suite)
+* [Scalability Strategy](#scalability-strategy)
+* [Setup & Installation](#setup--installation)
+* [Future Roadmap](#future-roadmap)
+
+---
 
 ## Quick Highlights
 
-*   **Explainable Agricultural Intelligence Platform:** Hybrid design using deterministic calculations with Generative AI presentation.
-*   **Deterministic Field Stress Index Engine:** Computes real-time thermal stress, rainfall deficits, and growth stage metrics.
-*   **Crop Stage Intelligence using GDD:** Tracks developmental crop progress via Growing Degree Days heat accumulation.
-*   **Disease Detection & Validation:** Visual analysis featuring Pillow image checks and state regional allowlists.
-*   **Emergency SOS Alert System:** Twilio SMS broadcast alerts with location mapping coordinates and offline outbox queues.
-*   **What-If Crop Simulation:** Evaluates projected stress curves and yield factor changes under hypothetical shifts.
-*   **Offline-First Progressive Web App:** Shell service worker caching and IndexedDB queue sync replaying.
-*   **FastAPI + Next.js + MongoDB Atlas:** Responsive PWA client, high-concurrency stateless backend APIs, slowapi rate limits, and secure store.
+*   **Deterministic Rule Engine:** Keeps agronomic math 100% code-based to prevent AI hallucinations in high-stakes decisions like chemical dosages.
+*   **Explainable RAG Advisories:** Pulls scientific agronomic standards from ChromaDB to output suggestions backed by document citations.
+*   **Offline-First App Shell:** Caches UI assets and queues local mutations via service workers and IndexedDB when network coverage drops.
+*   **Disease Allowlist Validation:** Leaf disease image recognition coupled with local Pillow quality checks and regional verification lists.
+*   **Emergency SOS System:** Sends alerts with live coordinates using Twilio, supported by offline queue synchronization.
 
 ---
 
@@ -53,103 +63,53 @@
 
 ---
 
-## Project Philosophy: Why HarvestIQ Is Different
+## Project Philosophy
 
-**HarvestIQ is NOT an AI chatbot.** Traditional chatbots hallucinate instructions, lack physical grounding, and present severe liability risks when providing crop chemical dosages. 
+We built HarvestIQ to solve a major problem with AI applications in critical fields like agriculture: the lack of reliability and trust. When dealing with chemical dosages, irrigation volumes, or outbreak responses, hallucinated advice from black-box LLMs can destroy a crop season and threaten a farmer's livelihood.
 
-HarvestIQ's architecture operates on a strict separation of concerns:
-1.  **Deterministic Agricultural Intelligence:** 100% of the agronomic telemetry analysis, Growing Degree Days (GDD) growth tracking, Field Stress Index (FSI) calculations, laboratory Soil Health checks, and Outbreak Radar scans are executed by deterministic Python algorithms.
-2.  **AI as a Presentation Layer:** Large Language Models (LLMs) are restricted strictly to visual feature extraction (for disease spot identification), native language translation (English, Hindi, and Marathi), and synthesizing structured intelligence payloads into conversational advisory briefings.
-3.  **Explainability & Grounding:** Advisory responses are generated by compiling the current farm telemetry snapshot and querying indexed agronomic research repositories (government and ICAR standards) using hybrid metadata vector retrieval (RAG). Every advice is accompanied by a transparent audit trail showing exactly which deterministic indicators and document citations triggered the action.
+Our design separates core agricultural intelligence from the communication interface. The calculations—including growth stages, weather stress, soil quality, and yield risk assessments—are computed by structured Python algorithms. Large Language Models (Gemini via OpenRouter) are restricted to formatting the results, translating warnings, transcribing speech, or extracting visual features from crop images. By grounding the LLM prompt templates with retrieved scientific research from government and ICAR guidelines, we ensure that every advisory is fully transparent, explainable, and verified by real telemetry data.
 
 ---
 
-## Project Journey (CodeFusion 2026)
+## Core Engines & Mathematical Models
 
-HarvestIQ was built for **CodeFusion 2026** to address two critical engineering challenges in digital agriculture:
-
-*   **The Hallucination Barrier:** In high-stakes environments like agriculture, a miscalculated chemical treatment or missed watering window can wipe out an entire season's yield. By embedding a deterministic gating validation pipeline, HarvestIQ eliminates black-box AI guidance.
-*   **The Zero-Connectivity Constraint:** Smallholder farms in remote rural zones frequently operate under complete network dropouts. HarvestIQ solves this by building an offline-first app shell cached via Progressive Web App (PWA) service workers, storing local mutations inside IndexedDB collections, and utilizing a transactional outbox queue that automatically syncs and reconciles entity IDs with the MongoDB cloud once connection is restored.
-
----
-
-## Executive Summary
-
-### The Agricultural Problem
-Modern farmers face compounding operational challenges. Weather volatility, nutrient deficiency, and sudden crop disease require immediate mitigation, yet traditional tools fall short:
-*   **Static Agricultural Apps:** Rely on static databases, generic weather apps, and rigid lookup tables that fail to adapt to localized crop stages.
-*   **Black-Box AI Models:** Hallucinate unverified treatments and lack the explainability required to make agronomic recommendations trustworthy.
-
-### How HarvestIQ Solves It
-HarvestIQ integrates localized weather predictions, laboratory soil nutrient metrics, crop-specific GDD progress, and regional disease radar reports into a single explainable interface. By keeping reasoning deterministic and presentation localized, it gives farmers transparent, reliable, and actionable insights to protect their fields and maximize yields.
-
----
-
-## The HarvestIQ Intelligence Stack
-
-At the center of HarvestIQ is a suite of decoupled services that compile telemetry and compute indices via [deterministic_engine.py](file:///Users/vishaljaiswal/Desktop/HARVESTIQ%20FINAL/harvestiq-engine/app/services/deterministic_engine.py).
+At the core of HarvestIQ is a deterministic engine that computes field indicators in [deterministic_engine.py](file:///Users/vishaljaiswal/Desktop/HARVESTIQ%20FINAL/harvestiq-engine/app/services/deterministic_engine.py).
 
 ![HarvestIQ Advanced Intelligence Dashboard](docs/screenshots/advanced_intelligence.png)
 
----
+### 1. Crop Stage Engine (GDD)
+Rather than tracking a crop's age by counting calendar days, we track developmental progress using thermal heat accumulation since the sowing date. This is much more accurate for real-world farming.
 
-### 1. Crop Stage Intelligence Engine (GDD)
-Instead of tracking progress chronologically, HarvestIQ evaluates growth progress by thermal heat accumulation since sowing.
-*   **Daily GDD Formula:**
-    $$\text{Daily GDD} = \max\left(\frac{T_{\text{max}} + T_{\text{min}}}{2} - T_{\text{base}}, 0.0\right)$$
-    *Where T-max and T-min represent daily weather forecast extremes, and T-base is the crop's physiological base threshold (e.g., 10°C for Wheat).*
-*   **Accumulated GDD:**
-    $$\text{Accumulated GDD} = \sum_{t=\text{sowing-date}}^{\text{today}} \text{Daily GDD}_t$$
-    *Evaluated against bounds loaded via CropStageService to determine the crop's current stage (e.g., Tillering, Flowering, Heading).*
+**Daily GDD Formula:**
+$$\text{Daily GDD} = \max\left(\frac{T_{\text{max}} + T_{\text{min}}}{2} - T_{\text{base}}, 0.0\right)$$
+*   $T_{\text{max}}$: Daily maximum forecast temperature.
+*   $T_{\text{min}}$: Daily minimum forecast temperature.
+*   $T_{\text{base}}$: Crop physiological base threshold (e.g., 10°C for Wheat).
+
+**Accumulated GDD:**
+$$\text{Accumulated GDD} = \sum_{t=\text{sowing-date}}^{\text{today}} \text{Daily GDD}_t$$
+*   $t$: Daily time step from sowing date to today.
+*   *Note: We map this accumulated sum against stage definitions to identify the crop's current stage (e.g., Tillering, Flowering, Heading).*
 
 ### 2. Field Stress Index (FSI) Engine
-FSI compiles multiple stress parameters into a composite rating scale between `0.0` (Optimal) and `1.0` (Severe Stress).
-*   **Composite Scoring Formula:**
-    $$\text{FSI} = 0.40 \times S_{\text{temp}} + 0.35 \times S_{\text{rain-deficit}} + 0.25 \times S_{\text{gdd-scale}}$$
-*   **Thermal Stress ($S_{\text{temp}}$):**
-    $$S_{\text{temp}} = \text{clamp}\left(\frac{T_{\text{effective}} - T_{\text{opt}}}{T_{\text{crit}} - T_{\text{opt}}}\right)$$
-    *Where T-effective is the maximum of current temperature and 3-day projected temperature forecast, T-opt is 32°C, and T-crit is 42°C.*
-*   **Rainfall Deficit ($S_{\text{rain-deficit}}$):**
-    $$S_{\text{rain-deficit}} = \text{clamp}\left(1.0 - \frac{\sum_{t=1}^{3} P_t}{E_{\text{expected}} \times 3}\right)$$
-    *Where P-t represents the daily forecasted precipitation (mm), and E-expected is 5.0mm (daily water budget).*
-*   **GDD Growth Scale ($S_{\text{gdd-scale}}$):**
-    $$S_{\text{gdd-scale}} = \text{clamp}\left(\text{stage-vulnerability} \times \frac{\text{current-gdd}}{\text{stage-gdd-max}}\right)$$
+FSI combines multiple weather and development parameters into a single index from `0.0` (Optimal) to `1.0` (Severe Stress).
 
-![HarvestIQ Analytics & Trend Signals](docs/screenshots/analytics_trend_signals.png)
+**Composite Scoring Formula:**
+$$\text{FSI} = 0.40 \times S_{\text{temp}} + 0.35 \times S_{\text{rain-deficit}} + 0.25 \times S_{\text{gdd-scale}}$$
+*   $S_{\text{temp}}$: Thermal stress index, calculated as $\text{clamp}\left(\frac{T_{\text{effective}} - T_{\text{opt}}}{T_{\text{crit}} - T_{\text{opt}}}\right)$, where $T_{\text{effective}}$ is the higher of current temperature and the 3-day forecast.
+*   $S_{\text{rain-deficit}}$: Rainfall deficit index, calculated as $\text{clamp}\left(1.0 - \frac{\sum_{t=1}^{3} P_t}{E_{\text{expected}} \times 3}\right)$ based on 3-day rain projections.
+*   $S_{\text{gdd-scale}}$: Growth vulnerability index, calculated as $\text{clamp}\left(\text{stage-vulnerability} \times \frac{\text{current-gdd}}{\text{stage-gdd-max}}\right)$.
 
 ---
 
-### 3. Stress Momentum Engine
-Monitors historical stress vectors to identify rapid deterioration before physical symptoms manifest.
-*   **Momentum Formula:**
-    $$\Delta = \text{FSI}_{\text{latest}} - \frac{\sum_{i=1}^{n-1} \text{FSI}_i}{n-1}$$
-*   **Classification:**
-    *   **RISING (Worsening):** $\Delta > 0.05$
-    *   **FALLING (Recovering):** $\Delta < -0.05$
-    *   **STABLE:** $-0.05 \le \Delta \le 0.05$
-
-### 4. Soil Health Index (SHI) Engine
-Analyzes laboratory measurements (Nitrogen, Phosphorus, Potassium, pH, Organic Carbon, Electrical Conductivity) against crop-specific optimal reference ranges.
-*   **Formulation:**
-    $$\text{SHI} = \frac{\sum (W_n \times S_n)}{\sum W_n}$$
-    *Where W-n is the nutrient-specific weight (e.g., Nitrogen = 0.35, Phosphorus = 0.20, pH = 0.15) and S-n is the nutrient score mapped based on deviation bounds.*
-
-### 5. Explainable Yield Risk Engine
-Estimates compound yield risk by combining field indices, growth stage parameters, and nearby disease threats.
-*   **Risk Evaluation:**
-    $$\text{Risk Percentage} = \text{clamp}\left(0.30 \times \text{FSI} + 0.15 \times \text{Momentum} + 0.15 \times \text{Vulnerability} + 0.20 \times \text{Soil-Stress} + 0.20 \times \text{Disease-Presence}\right) \times 100$$
-    *Yield risk classifications scale into bands: LOW (< 33%), MEDIUM (< 66%), and HIGH (>= 66%).*
-
-### 6. Unified Farm Health Score
-Synthesizes overall farm health into a rating out of 100:
-$$\text{Health Score} = S_{\text{fsi}} \times 25 + S_{\text{soil}} \times 25 + S_{\text{radar}} \times 10 + S_{\text{alerts}} \times 10 + S_{\text{yield-risk}} \times 10$$
-*   **Rating Bands:** `GOOD` ($\ge 75$), `FAIR` ($\ge 50$), and `POOR` ($< 50$).
+### Secondary Models
+Other engines—including the Stress Momentum Engine, Soil Health Index (SHI) Engine, Yield Risk Engine, and Unified Farm Health Score—are detailed in [docs/ALGORITHMS.md](file:///Users/vishaljaiswal/Desktop/HARVESTIQ%20FINAL/docs/ALGORITHMS.md).
 
 ---
 
 ## System Architecture & Data Flow
 
-HarvestIQ is structured with decoupled application layers, dividing client-side service worker cache layers, stateless FastAPI handlers, and the deterministic agronomic intelligence stack:
+Here is a complete breakdown of the project architecture, showing how the frontend, backend service routers, local and cloud databases, and external APIs communicate with each other:
 
 ```mermaid
 flowchart TB
@@ -220,124 +180,6 @@ flowchart TB
 
 ---
 
-## Feature Showcase
-
-### 1. Farm Operations Dashboard
-*   **Purpose:** Consolidated hub tracking core farm metrics.
-*   **Inputs:** GPS coordinates, crop sowing configuration details.
-*   **Outputs:** Overall health rating, computed GDD progress, crop stage, daily briefing text, and warning banners.
-*   **Benefits:** Instant visibility of field operations and stress alerts.
-
-![HarvestIQ Dashboard Quick Actions](docs/screenshots/dashboard_quick_actions.png)
-
----
-
-### 2. Threshold Monitoring & Alerts
-*   **Purpose:** Automatically trigger localized alerts when telemetry boundaries are crossed.
-*   **Inputs:** Weather forecast parameters and calculated FSI metrics.
-*   **Outputs:** Priority-tiered alerts (Info, Warning, Critical) indicating triggered rules.
-*   **Benefits:** Proactive mitigation of environmental stress.
-
-![HarvestIQ Threshold Alerts](docs/screenshots/threshold_monitoring.png)
-
----
-
-### 3. Advisory & Explainability Portal
-*   **Purpose:** Conversational chat and action center providing recommendations.
-*   **Inputs:** Question query, telemetry snapshot variables, RAG agronomic knowledge chunks.
-*   **Outputs:** Synthesized advice accompanied by explainability tables and sources citations.
-*   **Benefits:** Trustworthy advice grounded in verified agricultural research.
-
-![HarvestIQ Advisory Chat](docs/screenshots/advisory_chat.png)
-![HarvestIQ Advisory Action Center](docs/screenshots/advisory_action_center.png)
-
----
-
-### 4. Farm Operations Ledger
-*   **Purpose:** Record expenses and crop cycle transactions.
-*   **Inputs:** Category (Seeds, Fertilizer, Labor, fuel, rent), amount, date, notes.
-*   **Outputs:** Historical expenses log and financial cost lists.
-*   **Benefits:** Complete tracking of farm profitability.
-
-![HarvestIQ Farm Operations](docs/screenshots/farm_operations.png)
-
----
-
-### 5. What-If Simulator
-*   **Purpose:** Run simulations of weather and chemical adjustments before applying inputs.
-*   **Inputs:** Sliders for Temperature Shifts ($\Delta^\circ\text{C}$), Irrigation Changes ($\Delta\text{mm}$), and Nitrogen variations ($\Delta\text{kg/ha}$).
-*   **Outputs:** Projected FSI curve and simulated Yield Factor coefficients.
-*   **Benefits:** Risk-free operational planning.
-
-![HarvestIQ What-If Simulator](docs/screenshots/what_if_simulator.png)
-
----
-
-### 6. Crop Doctor (Disease Screening & Verification)
-*   **Purpose:** Upload leaf photos to diagnose crop diseases.
-*   **Inputs:** Camera or file image uploads.
-*   **Outputs:** Candidate disease classification tags, severity levels, prevention advice, and regional rule confirmations.
-*   **Benefits:** Eliminates false alarms through strict regional rule validation.
-
-![HarvestIQ Disease Detection Dashboard](docs/screenshots/disease_detection.png)
-
-#### Image Quality & Validation Checks
-The system includes validation to block blank, blurry, or non-crop image uploads:
-
-*   **Blank or Extreme Lighting Check:** Pillow-based grayscale mean and variance analysis blocks overexposed or underexposed uploads.
-*   **Not a Crop Image Check:** Vision-based content checks identify and block non-crop subjects (e.g. household items, animals).
-
-![HarvestIQ Extreme Lighting Detection](docs/screenshots/disease_detection_extreme_lighting.png)
-![HarvestIQ Invalid Image Detection](docs/screenshots/disease_detection_invalid_image.png)
-
-#### History & Timeline Logging
-All scan results are archived for historical tracking and auditing:
-
-*   **Disease Scan History:** Track scan dates, identified diseases, confidence levels, and severity classifications.
-*   **Farm Health Timeline:** A chronological events ledger tracking scans, alerts, and field advisories.
-
-![HarvestIQ Disease Scan History](docs/screenshots/disease_scan_history.png)
-![HarvestIQ Farm Health Timeline](docs/screenshots/farm_health_timeline.png)
-
----
-
-### 7. Emergency SOS Dispatch
-*   **Purpose:** Dispatch SMS alerts to emergency contacts during extreme events.
-*   **Inputs:** Event selection (Flood, Frost, Heatwave, General), GPS coordinates.
-*   **Outputs:** SMS notifications containing maps links, sent via Twilio (or queued in outbox if offline).
-*   **Benefits:** Ensures farmer safety and rapid coordination during crises.
-
-> [!NOTE]
-> **Twilio Sandbox Delivery Restriction:** Due to Twilio trial account restrictions, SOS alerts can currently be delivered only to phone numbers that have been verified in the Twilio console. Unverified numbers will not receive SMS/call notifications. For hackathon evaluation purposes, the feature is fully implemented and functional, but successful message delivery is limited to Twilio-verified recipient numbers.
-
-
-![HarvestIQ Emergency SOS Modal](docs/screenshots/emergency_sos_modal.png)
-![HarvestIQ Emergency SOS Dispatched](docs/screenshots/emergency_sos_dispatched.png)
-
----
-
-## Technical Deep Dive
-
-### Next.js 15 PWA Frontend
-*   **PWA Shell caching:** Assets are cached locally via service workers to ensure immediate loading under offline conditions.
-*   **Zustand:** Used for lightweight state management, handling credentials, offline caching, and outbox actions.
-*   **React Query / SWR:** Manages network request state, triggers automatic background revalidation, and manages local IndexedDB fallbacks.
-*   **Tailwind CSS:** Responsive, mobile-first design with smooth transitions and support for dark mode.
-
-### FastAPI Python Backend
-*   **Pydantic v2:** Enforces runtime request validation and response formatting.
-*   **Slowapi:** Protects public endpoints with decorator rate limits (e.g., `@limiter.limit("20/15minutes")`).
-*   **FastAPI APIRouter:** Modular architecture grouping routes into clean namespaces.
-*   **Uvicorn:** ASGI server hosting the backend app on high-concurrency event loops.
-
-### Storage & External APIs
-*   **MongoDB Atlas:** Stores documents containing user profiles, farm records, offline sync logs, and weather caches.
-*   **ChromaDB:** Local vector database storing indexed agronomic knowledge chunks (retrieved via cosine-similarity search for advisory prompts).
-*   **Open-Meteo API:** Provides high-fidelity weather forecasts based on lat/lon coordinates.
-*   **Twilio Client:** Integrates SMS broadcast workflows for emergency notifications.
-
----
-
 ## Repository Structure
 
 ```text
@@ -355,16 +197,16 @@ HarvestIQ
 │   └── README.md                           # Detailed Frontend Documentation
 │
 ├── harvestiq-engine/                       # FastAPI & Python 3.12 Backend
-    ├── app/
-    │   ├── api/v1/                         # API router routes (auth, weather, advisory, simulator, sos, sync)
-    │   ├── core/                           # Database, security config, and deterministic constants (fsi, yield_risk, soil)
-    │   ├── models/                         # Pydantic Schemas & MongoDB documents
-    │   ├── services/                       # Core service layers (advisory_service, context_compiler_service, deterministic_engine)
-    │   └── integrations/                   # External APIs (gemini_client, Twilio)
-    ├── data/agri_kb/                       # ICAR & Government regional crop knowledge markdown files
-    ├── scripts/                            # Seed scripts, backfills, test scripts, and initialization workers
-    ├── tests/                              # Pytest test suite for service layers and APIs
-    └── README.md                           # Detailed Backend Documentation
+│   ├── app/
+│   │   ├── api/v1/                         # API router routes (auth, weather, advisory, simulator, sos, sync)
+│   │   ├── core/                           # Database, security config, and deterministic constants (fsi, yield_risk, soil)
+│   │   ├── models/                         # Pydantic Schemas & MongoDB documents
+│   │   ├── services/                       # Core service layers (advisory_service, context_compiler_service, deterministic_engine)
+│   │   └── integrations/                   # External APIs (gemini_client, Twilio)
+│   ├── data/agri_kb/                       # ICAR & Government regional crop knowledge markdown files
+│   ├── scripts/                            # Seed scripts, backfills, test scripts, and initialization workers
+│   ├── tests/                              # Pytest test suite for service layers and APIs
+│   └── README.md                           # Detailed Backend Documentation
 │
 ├── docs/                                   # Platform documentation and screenshots
 │   ├── screenshots/                        # Mapped dashboard, simulator, and alert screenshots
@@ -375,117 +217,145 @@ HarvestIQ
 
 ---
 
-## API Endpoints Reference
+## Feature Showcase
 
+### 1. Farm Operations Dashboard
+The main control center maps the farm's GPS coordinates and crop sowing logs to produce live development data. It displays the current GDD stage, computed health band, and compiles daily meteorological warnings alongside an automated natural-language summary.
 
-<details>
-<summary><b>Click to expand full API Reference Table</b></summary>
+![HarvestIQ Dashboard Quick Actions](docs/screenshots/dashboard_quick_actions.png)
 
-### Authentication
+---
 
-| Method | Endpoint | Description | Slowapi Limit |
-| :--- | :--- | :--- | :--- |
-| `POST` | `/api/v1/auth/register` | Register a new user profile. | `20/15minutes` |
-| `POST` | `/api/v1/auth/login` | Authenticate and obtain tokens. | `20/15minutes` |
-| `POST` | `/api/v1/auth/refresh` | Refresh access tokens (via httponly cookie). | `10/15minutes` |
-| `POST` | `/api/v1/auth/logout` | Revoke session refresh tokens. | - |
+### 2. Threshold Monitoring & Alerts
+An automated background evaluator scans incoming forecasts and computed stress trends against threshold boundaries. When parameters (like high temperature spikes or cold frost warnings) cross critical ranges, it triggers priority-tiered alerts on the dashboard to warn the user.
 
-### Users & Onboarding
+![HarvestIQ Threshold Alerts](docs/screenshots/threshold_monitoring.png)
 
-| Method | Endpoint | Description | Auth Required |
-| :--- | :--- | :--- | :--- |
-| `GET` | `/api/v1/users/me` | Fetch public details of current user. | Yes |
-| `PUT` | `/api/v1/users/profile` | Update profile settings (name, language). | Yes |
-| `GET` | `/api/v1/users/alert-preferences` | Get alert preference configurations. | Yes |
-| `PUT` | `/api/v1/users/alert-preferences` | Update alert preferences. | Yes |
-| `POST` | `/api/v1/onboarding` | Complete onboarding configuration. | Yes |
+---
 
-### Farm Database Management (CRUD)
+### 3. Advisory & Explainability Portal
+A conversational portal built to help farmers get clear answers to agricultural questions. Unlike standard black-box AI tools, it query-retrieves research papers from ChromaDB and outputs the suggestions with a citation list and a table showing the raw telemetry values used in the reasoning.
 
-| Method | Endpoint | Description | Parameters |
-| :--- | :--- | :--- | :--- |
-| `GET` | `/api/v1/farms/me` | Retrieve the compiled profile for the active farm. | Yes |
-| `POST` | `/api/v1/farm-db/farms` | Create a new farm boundary record. | `FarmCreateSchema` (Body) |
-| `GET` | `/api/v1/farm-db/farms` | List all farms owned by the user. | Yes |
-| `GET` | `/api/v1/farm-db/farms/{farm_id}` | Retrieve specific farm bounds. | `farm_id` (Path) |
-| `PUT` | `/api/v1/farm-db/farms/{farm_id}` | Edit farm boundaries and metadata. | `farm_id` (Path) |
-| `DELETE` | `/api/v1/farm-db/farms/{farm_id}` | Remove farm records. | `farm_id` (Path) |
-| `GET` | `/api/v1/farm-db/plots` | List plots in a farm. | `farm_id` (Query) |
-| `POST` | `/api/v1/farm-db/plots` | Create a new plot record. | `PlotCreateSchema` (Body) |
-| `GET` | `/api/v1/farm-db/crop-cycles` | List crop cycles for a plot. | `plot_id` (Query) |
-| `GET` | `/api/v1/farm-db/crop-cycles/active` | Get all active cycles of the user. | Yes |
-| `POST` | `/api/v1/farm-db/expenses` | Log crop expense transactions. | `ExpenseCreateSchema` (Body) |
-| `GET` | `/api/v1/farm-db/expenses` | List expenses for a cycle. | `crop_cycle_id` (Query) |
-| `POST` | `/api/v1/farm-db/harvests` | Log harvest yield transactions. | `HarvestCreateSchema` (Body) |
-| `GET` | `/api/v1/farm-db/harvests` | List harvests for a cycle. | `crop_cycle_id` (Query) |
+![HarvestIQ Advisory Chat](docs/screenshots/advisory_chat.png)
+![HarvestIQ Advisory Action Center](docs/screenshots/advisory_action_center.png)
 
-### Weather, Stress & Soil Analytics
+---
 
-| Method | Endpoint | Description | Parameters |
-| :--- | :--- | :--- | :--- |
-| `GET` | `/api/v1/weather/forecast` | Retrieve forecast data with MongoDB TTL caching. | `farm_id` (Query) |
-| `GET` | `/api/v1/stress-index/{farm_id}` | Fetch current Field Stress Index and trajectory. | `farm_id` (Path) |
-| `POST` | `/api/v1/soil/records` | Save laboratory soil measurements. | `SoilRecordCreateSchema` (Body) |
-| `GET` | `/api/v1/soil/records/latest` | Fetch the latest soil nutrient scores. | `farm_id` (Query) |
+### 4. Farm Operations Ledger
+A simple, local ledger that tracks crop expenses and income. Farmers can log inputs (seed, fertilizer, fuel, labor, or rental costs) for specific crop cycles to monitor operational costs and calculate profitability.
 
-### Copilot & Advisory
+![HarvestIQ Farm Operations](docs/screenshots/farm_operations.png)
 
-| Method | Endpoint | Description | Parameters |
-| :--- | :--- | :--- | :--- |
-| `GET` | `/api/v1/briefing/daily` | Compile daily briefing summaries. | `farm_id` (Query) |
-| `GET` | `/api/v1/health-card` | Get farm health metrics cards. | `farm_id` (Query) |
-| `GET` | `/api/v1/copilot/plan` | Fetch or generate operations schedules. | `farm_id`, `refresh` (Query) |
-| `POST` | `/api/v1/copilot/plan/refresh` | Force regenerate copilot plans. | `farm_id` (Query) |
-| `PUT` | `/api/v1/copilot/plan/actions/{action_id}/complete` | Mark an action complete. | `action_id` (Path), `farm_id` (Query) |
-| `GET` | `/api/v1/copilot/yield-protection` | Retrieve computed yield protection score. | `farm_id` (Query) |
-| `POST` | `/api/v1/advisory/ask` | Submit questions to advisory chat. | `AdvisoryAskRequest` (Body) |
-| `GET` | `/api/v1/advisory/actions` | Retrieve recommended actions list. | `farm_id` (Query) |
+---
 
-### Disease Detection & Outbreak Radar
+### 5. What-If Simulator
+An interactive simulation engine allowing farmers to preview changes before taking action. It uses sliders to simulate changes in temperature forecasts, irrigation limits, or fertilizer inputs, plotting how these mock adjustments would impact stress and estimated yield factors.
 
-| Method | Endpoint | Description | Parameters |
-| :--- | :--- | :--- | :--- |
-| `POST` | `/api/v1/disease/detect` | Upload leaf images for disease screening. | File upload (Multipart) |
-| `GET` | `/api/v1/disease/history` | List all historical reports. | `farm_id` (Query) |
-| `GET` | `/api/v1/disease/history/{report_id}` | Retrieve specific scan reports. | `report_id` (Path) |
-| `GET` | `/api/v1/disease/history/{report_id}/image` | Fetch raw uploaded image bytes. | `report_id` (Path) |
-| `GET` | `/api/v1/disease/timeline` | Get merged event timeline records. | `farm_id` (Query) |
-| `GET` | `/api/v1/disease-radar/nearby` | Query nearby outbreak coordinates. | `farm_id` (Query) |
+![HarvestIQ What-If Simulator](docs/screenshots/what_if_simulator.png)
 
-### Emergency SOS & Sync
+---
 
-| Method | Endpoint | Description | Parameters |
-| :--- | :--- | :--- | :--- |
-| `POST` | `/api/v1/sos/trigger` | Dispatch emergency SOS alerts to contacts. | `SosTriggerRequest` (Body) |
-| `POST` | `/api/v1/sos/dispatch` | Trigger emergency dispatch (alias trigger). | `SosTriggerRequest` (Body) |
-| `GET` | `/api/v1/sos/contacts` | Get user emergency contacts list. | Yes |
-| `POST` | `/api/v1/sos/contacts` | Save emergency contact configurations. | `EmergencyContactsSchema` (Body) |
-| `GET` | `/api/v1/sos/history` | Fetch historical SOS logs. | Yes |
-| `POST` | `/api/v1/simulator/run` | Run stress forecast simulation runs. | `SimulatorRequest` (Body) |
-| `POST` | `/api/v1/sync` | Replay batch IndexedDB outbox queues. | `SyncBatchRequest` (Body) |
+### 6. Crop Doctor (Disease Screening & Verification)
+Uses leaf image diagnostic modules coupled with local verification checks. It includes a Pillow-based exposure check to flag dark or blurry images, an initial visual filter to confirm if a plant leaf is present, and a regional state allowlist to verify the diagnosis before saving reports.
 
-</details>
+![HarvestIQ Disease Detection Dashboard](docs/screenshots/disease_detection.png)
+
+#### Image Quality & Validation Checks
+*   **Exposure Check:** Grayscale mean and variance calculations prevent under/overexposed images from going to the API.
+*   **Plant Presence Check:** A quick visual check blocks non-plant subjects (like objects or animals) to reduce false reports.
+
+![HarvestIQ Extreme Lighting Detection](docs/screenshots/disease_detection_extreme_lighting.png)
+![HarvestIQ Invalid Image Detection](docs/screenshots/disease_detection_invalid_image.png)
+
+#### History & Timeline Logging
+Tracks all scans and historical reports, consolidating alerts and diagnostic timelines into a chronological farm health log.
+
+![HarvestIQ Disease Scan History](docs/screenshots/disease_scan_history.png)
+![HarvestIQ Farm Health Timeline](docs/screenshots/farm_health_timeline.png)
+
+---
+
+### 7. Emergency SOS Dispatch
+Sends coordinates and urgent safety status alerts to a pre-set list of contacts during extreme weather events. If the phone is offline, the message is queued inside the outbox database and broadcasted using Twilio as soon as connectivity returns.
+
+> [!NOTE]
+> **Twilio Testing Limit:** Due to Twilio sandbox account constraints, emergency SOS alerts can only be delivered to phone numbers that are verified in our Twilio developer console. This is a prototype limitation and can be swapped for a production SMS gateway.
+
+![HarvestIQ Emergency SOS Modal](docs/screenshots/emergency_sos_modal.png)
+![HarvestIQ Emergency SOS Dispatched](docs/screenshots/emergency_sos_dispatched.png)
+
+---
+
+## Implementation Snippet
+
+Below is the core function from our deterministic engine used to calculate the composite Field Stress Index (FSI). This calculation runs entirely in Python, avoiding LLM hallucinations:
+
+```python
+def compute_fsi(temp_stress: float, rainfall_deficit: float, gdd_scale: float) -> float:
+    w_temp, w_rain, w_gdd = FSI_WEIGHTS # Loaded from constants: 0.40, 0.35, 0.25
+    fsi = (w_temp * temp_stress) + (w_rain * rainfall_deficit) + (w_gdd * gdd_scale)
+    return round(min(max(fsi, 0.0), 1.0), 2)
+```
+
+---
+
+## Design Decisions
+
+*   **FastAPI Backend:** We selected FastAPI because of its native ASGI concurrency and fast Pydantic schema validation. This allows us to compile multi-source forecast telemetry and index calculations efficiently.
+*   **MongoDB Atlas:** We needed a flexible document model to handle changing farm bounds, variable crop cycles, and cache weather logs without the overhead of relational migrations.
+*   **ChromaDB Vector Store:** Used locally for similarity search. It is lightweight, runs within our backend container, and matches keyword tokens alongside metadata tags.
+*   **Separating Rules from AI:** We chose to keep calculations deterministic (written in Python) because letting an LLM calculate index numbers or dosages introduced severe hallucination risks. The LLM serves only to translate and present compiled data.
+*   **Offline-First App Shell:** Built as a Progressive Web App (PWA) with service workers and IndexedDB because smallholder farms are often in spots with poor cell coverage. Optimistic updates keep the UI functional while transactions queue local changes until network sync is possible.
+
+---
+
+## Engineering Journey
+
+We originally designed the advisory portal to compile raw prompt details and let the LLM directly output index ratings. However, early tests showed that prompt engineering alone could not prevent hallucinations in mathematical operations or crop-stage logic. 
+
+We pivoted to a decoupled model: we wrote structured Python algorithms to calculate indexes (GDD, FSI, Soil Health) first, then passed this calculated state directly to the Gemini API prompt template. This transition made the system explainable, providing the exact formulas, inputs, and ICAR RAG citations alongside the LLM's natural-language summary.
+
+---
+
+## Lessons Learned
+
+*   **Deterministic Gating:** High-stakes applications require deterministic boundaries. Mixing AI with rules is best done by using code for calculations and AI only for rendering responses.
+*   **Reconciliation Challenges:** Offline-first syncing is complex when handling relationships. Generating temporary client-side IDs and mapping them to server-generated MongoDB `ObjectId` keys requires careful reconciliation of outbox queues.
+*   **Telemetry Caching:** Frequent polling of forecast APIs quickly hits rate limits. Designing a localized cache layer using MongoDB TTL indices was essential to keep operations fast and cheap.
+
+---
+
+## Challenges
+
+*   **Offline Synchronization:** Building the outbox queue to handle sequential operations (e.g., creating a plot, adding a cycle, and logging an expense) required strict ordering. If the operations sync out of order, foreign key references break.
+*   **ChromaDB Metadata Gating:** Restricting vector search queries based on active crop variables and geographical boundaries required writing complex filtering checks before passing inputs to ChromaDB.
+
+---
+
+## API Reference
+
+We maintain an exhaustive reference of the FastAPI backend router endpoints, including HTTP methods, slowapi decorators rate limits, and schemas in [docs/API_REFERENCE.md](file:///Users/vishaljaiswal/Desktop/HARVESTIQ%20FINAL/docs/API_REFERENCE.md). You can also interactively execute and test these endpoints at `https://harvestiq-api.onrender.com/docs` when the API engine is active.
 
 ---
 
 ## Security & Reliability
 
-1.  **Bearer Gating:** All operations (excluding register, login, and static assets) require valid HTTP Bearer token validation.
-2.  **Rate Limiting:** slowapi rates restrict excessive queries to advisory ask and SOS triggers.
-3.  **Regional Restriction Rules:** Disease validation logic cross-references detected diseases with local agricultural lists, preventing misdiagnoses and false reports.
+1.  **Token Authentication:** Secure routes are protected by JWT Bearer tokens.
+2.  **Rate Limiting:** slowapi limits the amount of requests users can make to heavier APIs like SOS alerts and Gemini chat.
+3.  **Geographical Allowlist:** The disease scanner checks if the detected crop disease actually exists in the farm's region before finalizing the diagnostic report.
 
 ---
 
 ## Validation & Test Suite
 
-To verify correct stress calculation formulas and system reliability:
+We wrote test suites to check our stress algorithms and API endpoints:
 
-*   **Backend Pytest Suite:**
+*   **Backend Tests (Pytest):**
     ```bash
     cd harvestiq-engine
     .venv/bin/pytest
     ```
-*   **PWA Client Offline Verification Trace:**
+*   **Offline Trace (PWA client):**
     ```bash
     cd harvestiq-client
     npm run trace:offline
@@ -495,20 +365,9 @@ To verify correct stress calculation formulas and system reliability:
 
 ## Scalability Strategy
 
-*   **Stateless Scaling:** Backend routes are stateless, making horizontal scaling easy.
-*   **Database Partitioning:** MongoDB collections can shard farm profiles by geographical grids.
-*   **Caching:** In-memory caching on meteorological coordinates and Mandi price endpoints prevents downstream resource exhaustion.
-
----
-
-## Why HarvestIQ Is Different
-
-| Criteria | Generic AI Chatbot | Traditional Ag App | HarvestIQ Platform |
-| :--- | :--- | :--- | :--- |
-| **Logic Type** | Generative only (Hallucinations possible) | Static tables | **Deterministic calculations with explainable synthesis** |
-| **Connectivity** | Fails completely offline | Limited static storage | **Offline-first PWA with sync queues** |
-| **Decision Gating** | None | Simple rules | **Scientific calculations combined with regional allowlists** |
-| **Precision** | High risk of hallucinated advice | Generic advice | **Explainable advisory grounded with citations** |
+*   **Stateless Backend Router:** Backend instances are stateless, making them easy to scale horizontally.
+*   **MongoDB Partitioning:** MongoDB collections can easily be partitioned based on geographic coordinates.
+*   **API Cache Layer:** We cache weather forecasts and local crop prices to prevent hitting rate limits on external APIs.
 
 ---
 
@@ -561,11 +420,12 @@ npm run dev
 
 ## Future Roadmap
 
-*   **Offline Advisory:** Synthesize raw advisory briefings client-side during absolute network outages using lightweight browser LLM engines.
-*   **Multilingual Voice Assistant:** Expand native vocal transcription modules for regional dialects.
-*   **WhatsApp Integration:** SMS alerts forwarding to WhatsApp messaging accounts.
-*   **NDVI Satellite Analytics:** Incorporate spatial spectral imaging updates for automated stress indexing.
+Here are the next features we plan to implement:
+*   **Local Browser AI:** Running lightweight LLMs in the browser to provide advisory chat when completely offline.
+*   **Multilingual Voice Search:** Adding voice-to-text input supporting regional Indian languages.
+*   **WhatsApp Integration:** Forwarding SOS alerts directly to WhatsApp.
+*   **NDVI Satellite Imagery:** Pulling satellite imagery to automatically track crop health indices and stress maps.
 
 ---
 
-Made with ❤️ by HarvestIQ Team
+Made with ❤️

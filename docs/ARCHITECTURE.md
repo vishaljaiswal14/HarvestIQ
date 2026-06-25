@@ -1,83 +1,75 @@
 # System Architecture & Flow Traces
 
-This document details the architectural design of HarvestIQ, its core components, its hybrid intelligence model, and end-to-end trace routes for key operational flows.
+This document breaks down how we structured HarvestIQ, how its core components fit together, our hybrid intelligence strategy, and step-by-step traces showing how data flows through our services.
 
 ---
 
 ## Hybrid Intelligence Design Philosophy
 
-HarvestIQ employs a strict **Hybrid Intelligence** paradigm:
-1.  **Deterministic Calculations:** All agronomic math, threat modeling, yield risks, soil indexes, and emergency checklists are computed 100% deterministically by the Python backend or edge client. Generative AI is NEVER permitted to decide or score farm safety.
-2.  **Generative Presentation:** Large Language Models (Gemini via OpenRouter) are used exclusively for natural language synthesis (translating raw metrics into localized reports for the farmer), voice transcription, and visual image classification (Crop Doctor leaf tagging). 
-3.  **Strict Grounding:** The generative models are context-grounded. The deterministic backend compiles a structured snapshot (`ContextCompilerService` snapshot version **v3**) of the farm state and inputs it as the only valid knowledge source in the prompt template.
+We designed HarvestIQ with a clear rule: **never let the LLM make high-risk agronomic decisions**. That's why we use a hybrid design:
+1.  **Deterministic Calculations (Python):** All calculations for soil, stress indices, yield risks, and emergency checklists are handled by normal Python code on the backend or client. Generative AI is never in charge of scoring farm safety.
+2.  **Generative Presentation (Gemini):** We only use the LLM (Gemini via OpenRouter) to write readable summaries, translate languages, transcribe audio, or analyze leaf images (Crop Doctor leaf tagging).
+3.  **Strict Grounding:** The LLM is strictly constrained. The backend compiles a structured snapshot (`ContextCompilerService` snapshot version **v3**) of the farm state and feeds it to Gemini as the *only* source of truth.
 
 ---
 
 ## Core Engines & Components
 
-### 1. Authentication Subsystem
-*   **Mechanisms:** Standard OAuth2 Password Bearer flow.
-*   **Tokens:** Serves a JWT `access_token` (expires in 15 minutes) and a hashed `refresh_token` (stored in the MongoDB `sessions` collection with a 7-day TTL).
-*   **State:** The client stores the JWT in memory and a stateful Zustand store (`authStore.ts`). The refresh token is sent as a secure, HTTP-only cookie.
-*   **Offline Behavior:** When offline, if token refresh fails, the client transitions to offline mode. API requests are intercepted and redirected to IndexedDB caches or static fixtures to maintain UI availability.
+### 1. Authentication
+*   **How it works:** Standard OAuth2 Password Bearer flow.
+*   **Tokens:** Returns a JWT `access_token` (expires in 15 mins) and a hashed `refresh_token` (stored in MongoDB `sessions` with a 7-day TTL).
+*   **State Management:** The frontend store (`authStore.ts` using Zustand) keeps the JWT in memory, and the refresh token is stored in a secure HTTP-only cookie.
+*   **Offline Mode:** If we lose connection and can't refresh the token, the client switches to offline mode. It intercepts API calls and pulls data from local IndexedDB caches or static mocks so the UI doesn't break.
 
 ### 2. Weather Engine
-*   **Mechanism:** `WeatherService` coordinates fetching. If cached data for a farm is younger than 30 minutes, it returns the cache. Otherwise, it invokes the Open-Meteo REST API.
-*   **Persistence:** The forecast data (hourly temperature, precipitation, wind speed, humidity, and 7-day forecasts) is cached in the MongoDB `weather_cache` collection with an `expires_at` TTL index.
-*   **GDD Calculation:** Generates daily GDD indices:
-    $$\text{GDD} = \max\left(\frac{T_{\text{max}} + T_{\text{min}}}{2} - T_{\text{base}}, 0.0\right)$$
-    where $T_{\text{base}}$ is retrieved from `crop_characteristics` depending on the active crop.
+*   **How it works:** `WeatherService` handles weather queries. It checks if we have cached weather data for the coordinates that is less than 30 minutes old. If it's stale, it hits the Open-Meteo API.
+*   **Caching:** Saves forecast telemetry (hourly temps, rain, wind, humidity, 7-day forecast) to MongoDB (`weather_cache` collection) with a TTL index.
+*   **GDD Math:** Computes daily Growing Degree Days: $\text{GDD} = \max\left(\frac{T_{\text{max}} + T_{\text{min}}}{2} - T_{\text{base}}, 0.0\right)$ where $T_{\text{base}}$ is fetched from `crop_characteristics` depending on the active crop.
 
 ### 3. Crop Stage Engine
-*   **Mechanism:** `CropStageService` monitors active `crop_cycles`.
-*   **Flow:**
-    1. Fetches historical and forecast weather for the farm.
-    2. Gathers daily GDD entries from the sowing date to today.
-    3. Accumulates GDD.
-    4. Compares accumulated GDD with stage ranges (e.g., Tillering, Flowering, Maturity) stored in `crop_characteristics`.
-    5. Updates the MongoDB `crop_cycles` document with the current GDD and returns progress percentage.
+*   **How it works:** `CropStageService` monitors active `crop_cycles`.
+*   **Steps:**
+    1. Pulls weather history and forecast coordinates.
+    2. Adds up daily GDD starting from the sowing date.
+    3. Maps accumulated GDD bounds to growth stages (like Tillering, Flowering, Maturity) stored in `crop_characteristics`.
+    4. Updates the `crop_cycles` document in MongoDB with the GDD and calculates progress percentage.
 
 ### 4. Stress Index Engine (Field Stress Index - FSI)
-*   **Mechanism:** `StressIndexService` computes a composite stress level between `0.0` (optimal) and `1.0` (critical) using:
-    $$\text{FSI} = 0.40 \times S_{\text{temp}} + 0.35 \times S_{\text{rain-deficit}} + 0.25 \times S_{\text{gdd-scale}}$$
-    *   **$S_{\text{temp}}$ (Temperature Stress):** Max temp over a 3-day forecast window evaluated against optimal ($32^\circ\text{C}$) and critical ($42^\circ\text{C}$) boundaries.
-    *   **$S_{\text{rain-deficit}}$ (Moisture Deficit):** Rain projected over 3 days compared to the daily water requirement (expected $5\text{mm}$ daily).
-    *   **$S_{\text{gdd-scale}}$ (Developmental Vulnerability):** Vulnerability weighting based on the current GDD stage progress.
-*   **Stress Momentum:** Measures whether stress is worsening or improving by comparing the latest FSI against the average of the last 5 logs:
-    $$\Delta = \text{FSI}_{\text{latest}} - \text{Avg}(\text{FSI}_{\text{historical}})$$
-    If $\Delta > 0.05$, status is `RISING`. If $\Delta < -0.05$, status is `FALLING`. Else, `STABLE`.
+*   **How it works:** `StressIndexService` calculates a composite score between `0.0` (optimal) and `1.0` (critical) using: $\text{FSI} = 0.40 \times S_{\text{temp}} + 0.35 \times S_{\text{rain-deficit}} + 0.25 \times S_{\text{gdd-scale}}$
+    *   **$S_{\text{temp}}$ (Temperature Stress):** Evaluates the max temp in a 3-day forecast against optimal ($32^\circ\text{C}$) and critical ($42^\circ\text{C}$) limits.
+    *   **$S_{\text{rain-deficit}}$ (Rain Deficit):** Compares 3-day rain projections with the crop's daily water requirement (budgeted at $5\text{mm}$ daily).
+    *   **$S_{\text{gdd-scale}}$ (Growth Vulnerability):** Weighting based on current GDD growth stage.
+*   **Stress Momentum:** Checks if stress is getting worse or recovering by comparing the current FSI against the average of the last 5 logs: $\Delta = \text{FSI}_{\text{latest}} - \text{Avg}(\text{FSI}_{\text{historical}})$ (categorized as `RISING` if $\Delta > 0.05$, `FALLING` if $\Delta < -0.05$, or `STABLE` otherwise).
 
 ### 5. Soil Health Engine
-*   **Mechanism:** `SoilHealthService` evaluates nitrogen (N), phosphorus (P), potassium (K), pH, organic carbon (OC), and electrical conductivity (EC).
-*   **Flow:**
-    1. Compares raw values against reference ranges in `soil_reference_ranges.json`.
-    2. Marks each nutrient as `DEFICIENT`, `OPTIMAL`, or `HIGH`.
+*   **How it works:** `SoilHealthService` evaluates nutrient metrics (Nitrogen, Phosphorus, Potassium, pH, Organic Carbon, Electrical Conductivity).
+*   **Steps:**
+    1. Checks raw values against reference guidelines in `soil_reference_ranges.json`.
+    2. Flags each nutrient as `DEFICIENT`, `OPTIMAL`, or `HIGH`.
     3. Calculates a weighted composite Soil Health Index (SHI) score out of 100.
-    4. Explains health status via `explainability_service.py`.
+    4. Generates an explainable summary via `explainability_service.py`.
 
 ### 6. RAG Retrieval Engine
-*   **Mechanism:** `RagService` implements hybrid vector + keyword matching.
-*   **Flow:**
-    1. Extracts crop, state, district, and inferred query topic.
-    2. Filters matching document metadata in MongoDB (`knowledge_metadata`) to compile allowed document IDs.
-    3. Executes a query on ChromaDB filtering by state, district, and document IDs.
-    4. Scores results by combining cosine similarity (80% weight) with keyword token frequency checks (20% weight) and returns top chunks.
+*   **How it works:** `RagService` performs hybrid vector + keyword matching.
+*   **Steps:**
+    1. Extracts query topics, crop, state, and district.
+    2. Looks up MongoDB `knowledge_metadata` to find allowed document IDs.
+    3. Queries ChromaDB, filtering by geographic metadata and allowed IDs.
+    4. Combines cosine similarity (80% weight) with keyword token frequency (20% weight) to return the most relevant text chunks.
 
 ### 7. Yield Risk Engine
-*   **Mechanism:** `YieldRiskService` combines multiple parameters to determine yield danger:
-    *   **Inputs:** FSI, Stress Momentum, growth stage vulnerability, Soil Health Index, confirmed crop diseases, and regional disease radar reports.
-    *   **Band:** `LOW` (<35%), `MEDIUM` (35–70%), `HIGH` (>70%).
+*   **How it works:** `YieldRiskService` combines multiple telemetry indicators to assess potential yield danger.
+*   **Inputs:** FSI, Stress Momentum, growth stage, soil index, confirmed crop diseases, and regional radar warnings.
+*   **Outputs:** Maps risk into bands: `LOW` (<35%), `MEDIUM` (35–70%), or `HIGH` (>70%).
 
 ### 8. Unified Farm Health Score
-*   **Mechanism:** Combines components into a single metric out of 100:
-    $$\text{Health Score} = S_{\text{fsi}} \times 25 + S_{\text{soil}} \times 25 + S_{\text{radar}} \times 10 + S_{\text{alerts}} \times 10 + S_{\text{yield-risk}} \times 10$$
-    Classified as `GOOD` ($\ge 75$), `FAIR` ($50\text{--}74$), or `POOR` ($<50$).
+*   **How it works:** Summarizes all signals into a single score out of 100: $\text{Health Score} = S_{\text{fsi}} \times 25 + S_{\text{soil}} \times 25 + S_{\text{radar}} \times 10 + S_{\text{alerts}} \times 10 + S_{\text{yield-risk}} \times 10$ (classified as `GOOD` $\ge 75$, `FAIR` $50\text{--}74$, or `POOR` $<50$).
 
 ---
 
 ## Offline-First Architecture & Sync Engine
 
-HarvestIQ provides high resiliency in zones with flaky internet through a specialized offline handler in `harvestiq-client`:
+Since cell service is notoriously unreliable in rural fields, we built a custom offline sync engine into `harvestiq-client`. Here is the sequence:
 
 ```mermaid
 sequenceDiagram
@@ -118,9 +110,9 @@ sequenceDiagram
     Fetch-->>UI: Fire "outbox-updated" event, UI shifts to permanent IDs
 ```
 
-### Relationship Reconciliation
-When mutating resources (like creating a Farm, Plot, and Crop Cycle) offline, the client generates temporary random IDs (e.g. `plot-1718000-xyz`). The outbox stores these. Upon going online, the backend receives this queue. It writes records to MongoDB, which issues permanent `ObjectId` values (e.g. `607c...`).
-The frontend `syncOutbox` service receives the mapping of `client_id` -> `server_id` and updates local IndexedDB keys to match the new ObjectIDs, preventing duplication during subsequent synchronization steps.
+### How We Reconcile IDs (Relationship Reconciliation)
+When a farmer creates a Farm, Plot, or Crop Cycle offline, the client generates temporary IDs (like `plot-1718000-xyz`) and saves them in the outbox. When the phone goes back online, the frontend sends the outbox queue to the backend. The backend inserts the records into MongoDB, which generates permanent `ObjectId` keys.
+Our frontend `syncOutbox` service receives this ID mapping map (`client_id` -> `server_id`) and updates local IndexedDB keys, so subsequent syncs or references don't result in duplicate entries.
 
 ---
 
@@ -190,10 +182,11 @@ graph LR
 4.  **Service Processing:**
     *   Checks that file sizes are within limits ($2\text{ MB}$ max) and checks file types (WebM, WAV, etc.).
     *   Attempts to call `self.gemini_client.transcribe_audio(audio_bytes, mime_type, language)`.
-5.  **Integration Failure:**
-    *   Because `OpenRouterClient` lacks the `transcribe_audio` method, Python raises an `AttributeError`.
-    *   The service layer catches this exception and raises a `bad_gateway` (502) error.
-    *   **Result:** The flow breaks completely at the Integration Layer. No database writes happen.
+5.  **Why it fails (Integration Failure):**
+    *   The backend code calls `self.gemini_client.transcribe_audio(...)` on the `OpenRouterClient`, but that method hasn't been implemented in the client class yet.
+    *   This raises a Python `AttributeError`.
+    *   The service layer catches it and returns a `502 Bad Gateway` error back to the frontend.
+    *   **Result:** The flow breaks at the integration level, and no files or logs are saved in MongoDB.
 
 ---
 
@@ -269,7 +262,7 @@ graph LR
     *   `ContextCompilerService` invokes `RagService.hybrid_search()` to scan ChromaDB and retrieve contextual knowledge chunks based on query keywords and farm parameters.
     *   `AdvisoryService` runs intent classification keywords matching (e.g. matches `IRRIGATION` from the keyword "irrigate").
     *   Evaluates guidelines (e.g. checks wind speeds or rainfall with `InputWindowOptimizerService`).
-5.  **Integration Bypassed:**
-    *   *System Mismatch:* While designed to call `OpenRouterClient.synthesize_advisory` to merge compile data with Gemini, the actual backend implementation `AdvisoryService.ask()` bypasses Gemini. It generates responses locally using a rule matrix and string interpolation.
-    *   *Underlying Bug:* If the integration client were invoked, it would fail since `OpenRouterClient.synthesize_advisory` posts to Google's raw Gemini API endpoint without passing any credentials (the `headers` dictionary with Bearer tokens is declared in `detect_disease` but omitted in `synthesize_advisory`).
+5.  **Rule Gating & Gemini Bypass:**
+    *   *How it's currently coded:* Even though we set up `OpenRouterClient.synthesize_advisory` to send the context snapshot to Gemini, the backend implementation inside `AdvisoryService.ask()` currently bypasses the LLM and runs a local rules matrix with string interpolation.
+    *   *Underlying Bug:* If we do try to call the Gemini API client, it fails because `synthesize_advisory` points to Google's direct Gemini endpoint but doesn't pass the authorization headers (the `headers` dict with API keys is set up in `detect_disease` but was left out in `synthesize_advisory`).
 6.  **Database Persistence:** Writes details (query, context package hash, final synthesis output, RAG chunks, and rules) to MongoDB `advisory_logs`. Returns `AdvisoryAskResponse`.
